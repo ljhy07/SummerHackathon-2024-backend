@@ -4,12 +4,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.summerhackaton.dto.MqttMessage
+import org.summerhackaton.model.Mqtt
 import org.summerhackaton.service.MqttService
 
 @RestController
 class MqttController(
     private val mqttOutboundGateway: MqttService.MqttOutboundGateway,
-    private val mqttInboundGateway: MqttService.MqttInboundGateway
+    private val mqttInboundGateway: MqttService.MqttInboundGateway,
+    val mqttService: MqttService
 ) {
 
     companion object {
@@ -18,16 +20,18 @@ class MqttController(
 
     @PostMapping("/mqtt/publish")
     fun publish(
-        @RequestBody request: MqttMessage
+        @RequestBody request: Mqtt
     ){
-        val message: String = request.message
+
 
 //        mqttService.save(MqttTest(
 //            clientId = clientId,
 //            message = message,
 //        ))
 //        mqttInboundGateway.sendToMqtt(message)
-        mqttOutboundGateway.sendToMqtt(message)
+
+        mqttService.save(request)
+        mqttOutboundGateway.sendToMqtt(request.id.toString())
     }
 
     @PostMapping("/mqtt/unpublish")

@@ -15,7 +15,7 @@ data class Mqtt (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 1,
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     val location: String,
 
     @Column(nullable = false)
