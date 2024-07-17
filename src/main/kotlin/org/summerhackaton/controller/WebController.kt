@@ -3,6 +3,7 @@ package org.summerhackaton.controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.summerhackaton.dto.Machines
 import org.summerhackaton.model.Mqtt
 import org.summerhackaton.dto.MqttRequest
 import org.summerhackaton.service.MqttService
@@ -14,8 +15,8 @@ class WebController(
 ) {
 
     @GetMapping("/api/machinesdata")
-    fun getMachinesData(): List<Mqtt>
-        = mqttService.findAll()
+    fun getMachinesData()
+        = Machines.of(mqttService.findAll())
 
     @GetMapping("/api/getdata")
     fun getMachineData(

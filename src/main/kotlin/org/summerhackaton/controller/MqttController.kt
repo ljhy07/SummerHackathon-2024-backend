@@ -8,7 +8,6 @@ import org.summerhackaton.service.MqttService
 
 @RestController
 class MqttController(
-    private val mqttService: MqttService,
     private val mqttOutboundGateway: MqttService.MqttOutboundGateway,
     private val mqttInboundGateway: MqttService.MqttInboundGateway
 ) {

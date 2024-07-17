@@ -3,12 +3,13 @@ package org.summerhackaton.service
 import org.springframework.integration.annotation.MessagingGateway
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
+import org.summerhackaton.dto.MqttRequest
 import org.summerhackaton.model.Mqtt
 import java.util.*
 
 @Service
 class MqttService(
-    val mqttRepository: MqttRepository
+    val mqttRepository: MqttRepository,
 ) {
     @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
     interface MqttOutboundGateway{
@@ -21,10 +22,10 @@ class MqttService(
     }
 
     fun save(mqtt: Mqtt): Mqtt
-            = mqttRepository.save(mqtt)
+        = mqttRepository.save(mqtt)
 
     fun findAll(): List<Mqtt>
-            = mqttRepository.findAll()
+        = mqttRepository.findAll()
 
     fun findById(id: Long): Optional<Mqtt>
         = mqttRepository.findById(id)
