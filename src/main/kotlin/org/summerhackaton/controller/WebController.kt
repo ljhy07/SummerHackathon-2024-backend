@@ -20,8 +20,10 @@ class WebController(
 
     @GetMapping("/api/getdata")
     fun getMachineData(
-        @RequestParam request: MqttRequest
-    ): Optional<Mqtt>
-        = mqttService.findById(request.id)
+        @RequestParam id: Long
+    ): Optional<Mqtt> {
+        println(id)
+        return mqttService.findById(id)
+    }
 
 }
