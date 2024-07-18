@@ -80,7 +80,7 @@ class MqttConfig(
     suspend fun tempMqttInbound(): MessageHandler {
         return MessageHandler { msg: Message<*> ->
             try {
-                mqttService.updateDataByIdToTemp((msg.toString()).toFloat())
+                mqttService.updateDataByIdToTemp(((msg.payload).toString()).toFloat())
                 println("Temp Data updated for ID: 1 with Payload: ${msg.payload}")
             } catch (e: Exception) {
                 println("Error processing payload: ${msg.payload}")
@@ -116,7 +116,7 @@ class MqttConfig(
     suspend fun turbidityMqttInbound(): MessageHandler {
         return MessageHandler { msg: Message<*> ->
             try {
-                mqttService.updateDataByIdToTurbidity((msg.toString()).toFloat())
+                mqttService.updateDataByIdToTurbidity(((msg.payload).toString()).toFloat())
                 println("Turbidity Data updated for ID: 1 with Payload: ${msg.payload}")
             } catch (e: Exception) {
                 println("Error processing payload: ${msg.payload}")
