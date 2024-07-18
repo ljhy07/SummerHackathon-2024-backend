@@ -19,10 +19,10 @@ data class Mqtt (
     val location: String,
 
     @Column(nullable = false)
-    val temp: Float,
+    var temp: Float,
 
     @Column(nullable = false)
-    val turbidity: Float,
+    var turbidity: Float,
 
     // 1 = 작동, 2 = 중지, 3 = 미사용
     @Column(nullable = false)

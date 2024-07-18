@@ -10,7 +10,8 @@ import org.summerhackaton.service.MqttService
 @RestController
 class MqttController(
     private val mqttOutboundGateway: MqttService.MqttOutboundGateway,
-    private val mqttInboundGateway: MqttService.MqttInboundGateway,
+    private val tempMqttInboundGateway: MqttService.TempMqttInboundGateway,
+    private val turbidityMqttInboundGateway: MqttService.TurbidityMqttInboundGateway,
     val mqttService: MqttService
 ) {
 
@@ -22,8 +23,6 @@ class MqttController(
     fun publish(
         @RequestBody request: Mqtt
     ){
-
-
 //        mqttService.save(MqttTest(
 //            clientId = clientId,
 //            message = message,
@@ -44,8 +43,9 @@ class MqttController(
 //            clientId = clientId,
 //            message = message,
 //        ))
-        mqttInboundGateway.sendToMqtt(message)
-//        mqttOutboundGateway.sendToMqtt(message)
+        mqttOutboundGateway.sendToMqtt(message)
+        tempMqttInboundGateway.sendToMqtt(message)
+        turbidityMqttInboundGateway.sendToMqtt(message)
     }
 
 }

@@ -1,5 +1,6 @@
 package org.summerhackaton.config
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.summerhackaton.service.MqttListener
 import org.springframework.context.annotation.Bean
@@ -15,20 +16,21 @@ import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.MessageHandler
 import org.summerhackaton.service.MqttService
-import java.time.LocalDateTime
 
 @Configuration
 class MqttConfig(
-//    val mqttService: MqttService
+    val mqttService: MqttService
 ) {
 
     companion object {
         private val brokerUrl = "tcp://broker.mqtt-dashboard.com"
 //        private val brokerUrl = "tcp://localhost:1883"
         private val outTopic = "bssm/redtide"
-        private val inTopic = "bssm/greentide"
+        private val tempInTopic = "bssm/greentide"
+        private val turbidityInTopic = "bssm/camera"
         private val pubClientId = "mqtt-ljhy-pub"
-        private val subClientId = "mqtt-ljhy-sub"
+        private val tempSubClientId = "mqtt-ljhy-sub-temp"
+        private val turbiditySubClientId = "mqtt-ljhy-sub-turb"
     }
 
     @Bean
@@ -53,31 +55,74 @@ class MqttConfig(
             }
 
     @Bean
-    fun mqttInboundChannel(): MessageChannel {
+    fun tempMqttInboundChannel(): MessageChannel {
         return DirectChannel()
     }
 
     @Bean
-    fun inbound(): MqttPahoMessageDrivenChannelAdapter {
+    fun tempInbound(): MqttPahoMessageDrivenChannelAdapter {
         val adapter = MqttPahoMessageDrivenChannelAdapter(
             brokerUrl,
-            subClientId,
+            tempSubClientId,
             mqttPahoClientFactory(),
-            inTopic,
+            tempInTopic,
         )
-
         adapter.setCompletionTimeout(5000)
         adapter.setConverter(DefaultPahoMessageConverter())
         adapter.setQos(1)
-        adapter.outputChannel = mqttInboundChannel()
+        adapter.outputChannel = tempMqttInboundChannel()
+
         return adapter
     }
 
     @Bean
-    @ServiceActivator(inputChannel = "mqttInboundChannel")
-    suspend fun mqttInbound(): MessageHandler {
+    @ServiceActivator(inputChannel = "tempMqttInboundChannel")
+    suspend fun tempMqttInbound(): MessageHandler {
         return MessageHandler { msg: Message<*> ->
-            println("Payload: ${msg}")
+            try {
+                mqttService.updateDataByIdToTemp((msg.toString()).toFloat())
+                println("Temp Data updated for ID: 1 with Payload: ${msg.payload}")
+            } catch (e: Exception) {
+                println("Error processing payload: ${msg.payload}")
+                e.printStackTrace()
+            }
         }
+//        return MqttListener()
+    }
+
+    @Bean
+    fun turbidityMqttInboundChannel(): MessageChannel {
+        return DirectChannel()
+    }
+
+    @Bean
+    fun turbidityInbound(): MqttPahoMessageDrivenChannelAdapter {
+        val adapter = MqttPahoMessageDrivenChannelAdapter(
+            brokerUrl,
+            turbiditySubClientId,
+            mqttPahoClientFactory(),
+            turbidityInTopic,
+        )
+        adapter.setCompletionTimeout(5000)
+        adapter.setConverter(DefaultPahoMessageConverter())
+        adapter.setQos(1)
+        adapter.outputChannel = turbidityMqttInboundChannel()
+
+        return adapter
+    }
+
+    @Bean
+    @ServiceActivator(inputChannel = "turbidityMqttInboundChannel")
+    suspend fun turbidityMqttInbound(): MessageHandler {
+        return MessageHandler { msg: Message<*> ->
+            try {
+                mqttService.updateDataByIdToTurbidity((msg.toString()).toFloat())
+                println("Turbidity Data updated for ID: 1 with Payload: ${msg.payload}")
+            } catch (e: Exception) {
+                println("Error processing payload: ${msg.payload}")
+                e.printStackTrace()
+            }
+        }
+//        return MqttListener()
     }
 }
